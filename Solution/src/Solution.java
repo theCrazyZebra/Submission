@@ -27,45 +27,35 @@ public class Solution
     public static void main(String[] args)
     {
         Document doc = new Document("");
-        Element content;
-        Elements tableItems = null;
-        JSONObject jsonParentObject;
+        Elements headings = null;
+        JSONFormatter jFormat = null;
+        int num = 1;
+        String formatted = "";
+        
         
         try
         {
             doc = Jsoup.connect("https://github.com/egis/handbook/blob/master/Tech-Stack.md").get();
             
             
-            //Programming Stack:
-            tableItems = doc.getElementsByTag("td");
-            
-            for (Element tableItem : tableItems) 
+            //Gettings the Headings:
+            headings = doc.getElementsByTag("h2");
+                        
+            //Getting the table data:
+            for (Element table : doc.getElementsByTag("table")) 
             {
-                String linkHref = tableItem.attr("td");
-                String linkText = tableItem.text();
+                Elements rows = table.getElementsByTag("tr");
                 
+                for (Element row : rows) 
+                {       
+                    jFormat = new JSONFormatter(rows);
+
+                 }
+
+                formatted = jFormat.format(headings.get(num).text());
+                System.out.println(formatted);
+                num++;
             }
-            
-            jsonParentObject = new JSONObject();
-        
-        for (Element table : doc.select("table")) 
-        {
-            for (Element row : table.select("tr")) 
-            {
-                JSONObject jsonObject = new JSONObject();
-                
-                Elements tds = row.select("td");
-                
-                String tech = tds.get(0).text();
-                String reason = tds.get(1).text();
-                String lifeCycle = tds.get(2).text();      
-                jsonObject.put("Tech", tech);
-                jsonObject.put("Reason", reason);
-                jsonObject.put("Life Cycle", lifeCycle);
-                jsonParentObject.put("",jsonObject);
-             }
-        }
-            System.out.println(jsonParentObject.toString());
         }
         
         catch(IOException i)
@@ -76,18 +66,7 @@ public class Solution
         {
             System.out.println("Encountered an Exception. Unable to convert document to JSON format");
         }
-    
-        String title = doc.title();
-        
-        System.out.println(title);
-        
-        tableItems.toArray();
-        
-        for(int i = 0; i < tableItems.size(); i = i + 3 )
-        {
-            Element ti = tableItems.get(i);
-            System.out.println(ti.text());
-        }
+            
     }
     
     
